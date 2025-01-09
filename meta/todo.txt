@@ -1,0 +1,8 @@
+TODO:
+- fill database with more data
+- add logging everywhere
+- In warehouse dashboard kick out products into their own sub-page
+- When you place an order flash success / failure depending on outcome
+- try and except, graceful error handling
+- when manually ordering handle estimated delivery time
+- manager can manage users

@@ -1,0 +1,57 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}
+  Panel Menadżera - Rubikon
+{% endblock %}
+
+{% block sidebar %}
+  <ul class="nav flex-column">
+    <!-- Link do menadżerowego dashboardu -->
+    <li class="nav-item">
+      <a class="nav-link active" href="{{ url_for('manager.manager_dashboard') }}">
+        <span data-feather="home"></span>
+        Panel Menadżera
+      </a>
+    </li>
+    <!-- Link do config -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+        <span data-feather="settings"></span>
+        Konfiguracja Aplikacji
+      </a>
+    </li>
+    <!-- Link do manual_order -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_manual_order') }}">
+        <span data-feather="edit"></span>
+        Manualne Zamówienie
+      </a>
+    </li>
+    <!-- Link do zarządzania dostawcami -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+        <span data-feather="users"></span>
+        Dostawcy
+      </a>
+    </li>
+
+    <!-- Linki do widoków magazyniera i księgowego (menadżer może to podglądać) -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+        <span data-feather="box"></span>
+        Panel Magazyniera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('accounting.accounting_dashboard') }}">
+        <span data-feather="dollar-sign"></span>
+        Panel Księgowego
+      </a>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+  <h1>Witaj w panelu menadżera</h1>
+  <p>Tutaj znajdziesz dostęp do wszystkich funkcji systemu: konfiguracji, zamówień, dostawców, raportów...</p>
+{% endblock %}

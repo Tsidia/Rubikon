@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Ręczna Korekta Stanów Magazynowych</h2>
+<p>Jeżeli stan faktyczny nie zgadza się z tym w systemie, wprowadź poprawną ilość.</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Produkt</th>
+      <th>Obecny Stan</th>
+      <th>Nowy Stan</th>
+      <th>Akcja</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in products %}
+    <tr>
+      <td>{{ p.product_name }}</td>
+      <td>{{ p.quantity_in_stock }}</td>
+      <td>
+        <!-- Form do przesłania new_quantity -->
+        <form action="{{ url_for('warehouse.manual_correction') }}" method="POST" class="form-inline">
+          <input type="hidden" name="product_id" value="{{ p.product_id }}">
+          <input type="number" name="new_quantity" value="{{ p.quantity_in_stock }}" class="form-control mr-2" min="0">
+          <button type="submit" class="btn btn-warning">Zapisz</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('warehouse.warehouse_dashboard') }}" class="btn btn-link">Powrót do panelu</a>
+{% endblock %}

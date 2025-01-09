@@ -1,0 +1,72 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Konfiguracja - Menadżer{% endblock %}
+{% block sidebar %}
+  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+        <span data-feather="home"></span>
+        Panel Menadżera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="{{ url_for('manager.manager_config') }}">
+        <span data-feather="settings"></span>
+        Konfiguracja
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_manual_order') }}">
+        <span data-feather="edit"></span>
+        Manualne Zamówienie
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+        <span data-feather="users"></span>
+        Dostawcy <span class="sr-only">(current)</span>
+      </a>
+    </li>
+
+    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+        <span data-feather="box"></span>
+        Panel Magazyniera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('accounting.accounting_dashboard') }}">
+        <span data-feather="dollar-sign"></span>
+        Panel Księgowego
+      </a>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+<h2>Konfiguracja aplikacji</h2>
+<form method="POST">
+  <div class="form-group">
+    <label for="safety_stock">Safety Stock (%)</label>
+    <input type="text" class="form-control" name="safety_stock"
+           value="{{ config.safety_stock }}" required>
+  </div>
+  <div class="form-group">
+    <label for="ordering_cost">Koszt zamówienia (S)</label>
+    <input type="text" class="form-control" name="ordering_cost"
+           value="{{ config.ordering_cost }}" required>
+  </div>
+  <div class="form-group">
+    <label for="holding_cost">Koszt magazynowania (H)</label>
+    <input type="text" class="form-control" name="holding_cost"
+           value="{{ config.holding_cost }}" required>
+  </div>
+  <div class="form-group">
+    <label for="lead_time">Lead time (dni)</label>
+    <input type="text" class="form-control" name="lead_time"
+           value="{{ config.lead_time }}" required>
+  </div>
+  <button type="submit" class="btn btn-primary">Zapisz</button>
+</form>
+{% endblock %}

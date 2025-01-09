@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Rubikon Dashboard Base">
+    <meta name="author" content="Rubikon">
+    <title>{% block title %}Rubikon Dashboard{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" 
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- Custom dashboard styles -->
+    <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+
+    {% block head_extra %}{% endblock %}
+  </head>
+
+  <body>
+    <!-- GÓRNY NAVBAR -->
+    <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
+  {% if role_name == 'manager' %}
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url_for('manager.manager_dashboard') }}">Rubikon</a>
+  {% elif role_name == 'magazynier' %}
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url_for('warehouse.warehouse_dashboard') }}">Rubikon</a>
+  {% elif role_name == 'ksiegowy' %}
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url_for('accounting.accounting_dashboard') }}">Rubikon</a>
+  {% else %}
+  <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="{{ url_for('home') }}">Rubikon</a>
+  {% endif %}
+      <input class="form-control form-control-dark w-100" type="text"
+             placeholder="Search" aria-label="Search">
+      <ul class="navbar-nav px-3">
+        <li class="nav-item text-nowrap">
+          <a class="nav-link" href="{{ url_for('auth.logout') }}">Sign out</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- KONTEJNER + SIDEBAR -->
+    <div class="container-fluid">
+      <div class="row">
+        <!-- SIDEBAR -->
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+          <div class="sidebar-sticky">
+            {% block sidebar %}
+            <!-- Domyślny sidebar -> linki do Orders, Products, Reports, itp.
+                 Możesz tu dać if-y w zależności od roli użytkownika
+                 lub nadpisać ten blok w widokach szczegółowych. -->
+            <ul class="nav flex-column">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">
+                  <span data-feather="home"></span>
+                  Dashboard <span class="sr-only">(current)</span>
+                </a>
+              </li>
+              <!-- Inne linki -->
+            </ul>
+            {% endblock %}
+          </div>
+        </nav>
+
+        <!-- Główna część strony -->
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+          {% block content %}
+          <!-- Każdy konkretny widok (np. manager, warehouse) uzupełnia tutaj. -->
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+
+    <!-- JS: Bootstrap, jQuery, Popper, Feather, itp. -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/
+            rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3RNHCID2iuR63LW8QTezEeRVz3MzEl
+            X8K9485Z8q3/ZJp6SwDk"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+    <script>
+      feather.replace()
+    </script>
+
+    <!-- Blok na dodatkowe skrypty specyficzne dla widoków -->
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

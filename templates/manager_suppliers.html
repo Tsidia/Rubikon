@@ -1,0 +1,229 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Dostawcy - Menadżer{% endblock %}
+{% block sidebar %}
+  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+        <span data-feather="home"></span>
+        Panel Menadżera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+        <span data-feather="settings"></span>
+        Konfiguracja
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_manual_order') }}">
+        <span data-feather="edit"></span>
+        Manualne Zamówienie
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="{{ url_for('manager.manager_suppliers') }}">
+        <span data-feather="users"></span>
+        Dostawcy <span class="sr-only">(current)</span>
+      </a>
+    </li>
+
+    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+        <span data-feather="box"></span>
+        Panel Magazyniera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('accounting.accounting_dashboard') }}">
+        <span data-feather="dollar-sign"></span>
+        Panel Księgowego
+      </a>
+    </li>
+  </ul>
+{% endblock %}
+{% block content %}
+  <h2>Dostawcy</h2>
+  <!-- Tabela z listą dostawców -->
+  <div class="table-responsive">
+    <table class="table table-striped table-sm" id="suppliersTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nazwa</th>
+          <th>Osoba kontaktowa</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Address / Comment</th>
+          <th>Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sup in suppliers %}
+        <tr data-supplier-id="{{ sup.supplier_id }}">
+          <!-- W trybie normalnym: wyświetlamy tekst;
+               w trybie edycji: pola input. -->
+          <!-- Aby uprościć, zrobimy obie wersje w HTML, a JavaScript będzie ukrywał/pokazywał odpowiednią. -->
+
+          <!-- ID -->
+          <td>
+            {{ sup.supplier_id }}
+            <input type="hidden" name="supplier_id" value="{{ sup.supplier_id }}">
+          </td>
+
+          <!-- Nazwa -->
+          <td>
+            <span class="view-mode">{{ sup.supplier_name }}</span>
+            <input type="text" class="form-control edit-mode" name="supplier_name" value="{{ sup.supplier_name }}" style="display:none;">
+          </td>
+
+          <!-- Osoba kontaktowa -->
+          <td>
+            <span class="view-mode">{{ sup.contact_name }}</span>
+            <input type="text" class="form-control edit-mode" name="contact_name" value="{{ sup.contact_name }}" style="display:none;">
+          </td>
+
+          <!-- Phone -->
+          <td>
+            <span class="view-mode">{{ sup.phone_number }}</span>
+            <input type="text" class="form-control edit-mode" name="phone_number" value="{{ sup.phone_number }}" style="display:none;">
+          </td>
+
+          <!-- Email -->
+          <td>
+            <span class="view-mode">{{ sup.email }}</span>
+            <input type="email" class="form-control edit-mode" name="email" value="{{ sup.email }}" style="display:none;">
+          </td>
+
+          <!-- Address / Comment -->
+          <td>
+            <span class="view-mode">{{ sup.address }}</span>
+            <input type="text" class="form-control edit-mode" name="address" value="{{ sup.address }}" style="display:none;">
+          </td>
+
+          <!-- Akcje -->
+          <td>
+            <!-- Normalny tryb: guzik "Edytuj" / "Usuń" -->
+            <div class="view-mode">
+              <form method="POST" style="display:inline;" onsubmit="return enterEditMode(this);">
+                <input type="hidden" name="action" value="edit_mode">
+                <input type="hidden" name="supplier_id" value="{{ sup.supplier_id }}">
+                <button type="submit" class="btn btn-sm btn-secondary">Edytuj</button>
+              </form>
+              <form method="POST" style="display:inline;">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="supplier_id" value="{{ sup.supplier_id }}">
+                <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+              </form>
+            </div>
+
+            <!-- Tryb edycji: guzik "Zapisz" i "Anuluj" -->
+            <div class="edit-mode" style="display:none;">
+              <form method="POST" class="editForm" style="display:inline;">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="supplier_id" value="{{ sup.supplier_id }}">
+                <!-- 
+                   Po klinięciu "Zapisz" prześlemy 
+                   wszystkie wartości inputów w tym wierszu 
+                   (JS klonuje je do formularza?), 
+                   by je zaktualizować w bazie.
+                -->
+                <button type="submit" class="btn btn-sm btn-success">Zapisz</button>
+              </form>
+              <button type="button" class="btn btn-sm btn-light" onclick="cancelEdit(this)">Anuluj</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Formularz do dodania nowego dostawcy -->
+  <h3>Dodaj nowego dostawcę</h3>
+  <form method="POST">
+    <input type="hidden" name="action" value="add">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label>Nazwa</label>
+        <input type="text" class="form-control" name="supplier_name" required>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label>Osoba kontaktowa</label>
+        <input type="text" class="form-control" name="contact_name">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label>Phone</label>
+        <input type="text" class="form-control" name="phone_number">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label>Email</label>
+        <input type="email" class="form-control" name="email">
+      </div>
+      <div class="col-md-8 mb-3">
+        <label>Address/Comment</label>
+        <input type="text" class="form-control" name="address">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Dodaj dostawcę</button>
+  </form>
+
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script>
+    // Funkcja wywoływana przy wciśnięciu "Edytuj"
+    // Zwraca false, by nie wysyłać formularza, tylko 
+    // w JS przełączyć wiersz w tryb edycji.
+    function enterEditMode(form) {
+      event.preventDefault();
+
+      // Znajdź wiersz (tr) 
+      let tr = form.closest('tr');
+      let viewModes = tr.querySelectorAll('.view-mode');
+      let editModes = tr.querySelectorAll('.edit-mode');
+
+      viewModes.forEach(el => el.style.display = 'none');
+      editModes.forEach(el => el.style.display = '');
+
+      return false;
+    }
+
+    // Funkcja Anuluj
+    function cancelEdit(btn) {
+      let tr = btn.closest('tr');
+      let viewModes = tr.querySelectorAll('.view-mode');
+      let editModes = tr.querySelectorAll('.edit-mode');
+
+      editModes.forEach(el => el.style.display = 'none');
+      viewModes.forEach(el => el.style.display = '');
+    }
+
+    // Obsługa wysyłania formularza w trybie edycji (Zapisz)
+    // W tym podejściu chcemy zebrać wartości inputów i wysłać je 
+    // do serwera w 1 formularzu.
+    document.querySelectorAll('.editForm').forEach(editForm => {
+      editForm.addEventListener('submit', function(e) {
+        // Pobieramy wiersz
+        let tr = editForm.closest('tr');
+
+        // Dla każdego inputa w tym wierszu wstawiamy do form
+        let inputs = tr.querySelectorAll('input.edit-mode');
+        inputs.forEach(inp => {
+          // Klonujemy input i dodajemy do editForm
+          let hidden = document.createElement('input');
+          hidden.type = 'hidden';
+          hidden.name = inp.name;
+          hidden.value = inp.value;
+          editForm.appendChild(hidden);
+        });
+
+        // Następnie pozwalamy wysłać
+      });
+    });
+  </script>
+{% endblock %}

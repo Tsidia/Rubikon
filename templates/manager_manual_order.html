@@ -1,0 +1,71 @@
+{% extends "dashboard_base.html" %}
+{% block title %}Manualne Zamówienie - Menadżer{% endblock %}
+{% block sidebar %}
+  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+        <span data-feather="home"></span>
+        Panel Menadżera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+        <span data-feather="settings"></span>
+        Konfiguracja
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="{{ url_for('manager.manager_manual_order') }}">
+        <span data-feather="edit"></span>
+        Manualne Zamówienie
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+        <span data-feather="users"></span>
+        Dostawcy <span class="sr-only">(current)</span>
+      </a>
+    </li>
+
+    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+        <span data-feather="box"></span>
+        Panel Magazyniera
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('accounting.accounting_dashboard') }}">
+        <span data-feather="dollar-sign"></span>
+        Panel Księgowego
+      </a>
+    </li>
+  </ul>
+{% endblock %}
+{% block content %}
+  <h2>Manualne zamówienie do dostawcy</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label for="supplier_id">Dostawca</label>
+      <select class="form-control" name="supplier_id">
+        {% for s in suppliers %}
+          <option value="{{ s.supplier_id }}">{{ s.supplier_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="product_id">Produkt</label>
+      <select class="form-control" name="product_id">
+        {% for p in products %}
+          <option value="{{ p.product_id }}">{{ p.product_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="quantity">Ilość</label>
+      <input type="number" class="form-control" name="quantity" min="1" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Zamów</button>
+  </form>
+{% endblock %}

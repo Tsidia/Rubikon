@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Panel księgowego</h2>
+<p>Przychód: {{ finances.total_income }}</p>
+<p>Koszty: {{ finances.total_expenses }}</p>
+<p>Zysk: {{ finances.profit }}</p>
+
+<h3>Raporty</h3>
+<ul>
+    <!-- <li><a href="{{ url_for('accounting.generate_report', report_type='sales') }}">Raport sprzedaży</a></li> -->
+    <!-- <li><a href="{{ url_for('accounting.generate_report', report_type='costs') }}">Raport kosztów</a></li> -->
+</ul>
+{% endblock %}
