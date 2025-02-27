@@ -1,8 +1,51 @@
 TODO:
-- fill database with more data
-- add logging everywhere
-- In warehouse dashboard kick out products into their own sub-page
-- When you place an order flash success / failure depending on outcome
-- try and except, graceful error handling
-- when manually ordering handle estimated delivery time
-- manager can manage users
+- add drawings and stuff
+- mniej nawiasów
+- Be very careful every time the AI talks about views, menadżer, and other stuff like that. System stuff, basically.
+- https?
+- review bezpieczneństwo in system plan
+- spolszczyć wszystko
+- uwaga na wroty typu "można zrobić to to i tamto"
+- mniej podsumowań
+- uwaga na narzędzia rozpatrywane
+- w głównym algorytmie więcej logowania
+- give data base example
+- "w niniejszym rozdziale"
+- take closer look at testing
+- you have to make it so that customer orders subtract from current supply
+- clarify safety buffer
+- update safety buffer text
+- auto orders made by user id 0
+
+
+Strona tytułowa ✓
+
+    Zgodnie z wytycznymi uczelni (nazwa uczelni, wydziału, kierunku, tytuł pracy, autor, promotor, rok).
+
+Oświadczenia i streszczenie ✓
+
+    Zazwyczaj: oświadczenie o samodzielności wykonania pracy, czasem krótki abstrakt (streszczenie w języku polskim i/lub angielskim).
+
+Spis treści ✓
+
+    Dokładny wykaz wszystkich rozdziałów, podrozdziałów i załączników.
+
+Wstęp ✓
+Cel i zakres pracy (lub osobno: „Cel pracy” i „Zakres pracy”) ✓
+Przegląd literatury i zagadnień teoretycznych ✓
+
+Projekt systemu ✓
+- Analiza wymagań i założeń funkcjonalnych ✓
+- Koncepcja architektury systemu ✓
+- Projekt bazy danych ✓
+- Modelowanie logiki systemu i algorytmów ✓
+- Warstwa prezentacji (interfejs użytkownika) ✓
+- Bezpieczeństwo, uprawnienia i zarządzanie użytkownikami ✓	
+- Omówienie alternatywnych rozwiązań i uzasadnienie wyboru ✓
+- Podsumowanie projektu systemu ✓
+Implementacja ✓
+Testy i wyniki ✓
+Dyskusja (opcjonalnie łączona z testami lub wnioskami)
+Wnioski
+Bibliografia / Spis literatury / Załączniki
+Jebanie się ze stylami

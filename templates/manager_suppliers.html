@@ -1,7 +1,6 @@
 {% extends "dashboard_base.html" %}
 {% block title %}Dostawcy - Menadżer{% endblock %}
 {% block sidebar %}
-  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
   <ul class="nav flex-column">
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
@@ -28,7 +27,19 @@
       </a>
     </li>
 
-    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
+<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('manager.manager_users') }}">
+    <span data-feather="user-check"></span>
+    Użytkownicy
+  </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
         <span data-feather="box"></span>
@@ -53,9 +64,10 @@
           <th>ID</th>
           <th>Nazwa</th>
           <th>Osoba kontaktowa</th>
-          <th>Phone</th>
+          <th>Telefon</th>
           <th>Email</th>
-          <th>Address / Comment</th>
+          <th>Adres</th>
+		  <th>Komentarz</th>
           <th>Akcje</th>
         </tr>
       </thead>
@@ -64,7 +76,7 @@
         <tr data-supplier-id="{{ sup.supplier_id }}">
           <!-- W trybie normalnym: wyświetlamy tekst;
                w trybie edycji: pola input. -->
-          <!-- Aby uprościć, zrobimy obie wersje w HTML, a JavaScript będzie ukrywał/pokazywał odpowiednią. -->
+          <!-- Obie wersje w HTML, a JavaScript będzie ukrywał/pokazywał odpowiednią. -->
 
           <!-- ID -->
           <td>
@@ -84,7 +96,7 @@
             <input type="text" class="form-control edit-mode" name="contact_name" value="{{ sup.contact_name }}" style="display:none;">
           </td>
 
-          <!-- Phone -->
+          <!-- Telefon -->
           <td>
             <span class="view-mode">{{ sup.phone_number }}</span>
             <input type="text" class="form-control edit-mode" name="phone_number" value="{{ sup.phone_number }}" style="display:none;">
@@ -96,10 +108,16 @@
             <input type="email" class="form-control edit-mode" name="email" value="{{ sup.email }}" style="display:none;">
           </td>
 
-          <!-- Address / Comment -->
+          <!-- Adres -->
           <td>
             <span class="view-mode">{{ sup.address }}</span>
             <input type="text" class="form-control edit-mode" name="address" value="{{ sup.address }}" style="display:none;">
+          </td>
+		  
+		  <!-- Komentarz -->
+		  <td>
+            <span class="view-mode">{{ sup.comment }}</span>
+            <input type="text" class="form-control edit-mode" name="comment" value="{{ sup.comment }}" style="display:none;">
           </td>
 
           <!-- Akcje -->
@@ -126,8 +144,8 @@
                 <!-- 
                    Po klinięciu "Zapisz" prześlemy 
                    wszystkie wartości inputów w tym wierszu 
-                   (JS klonuje je do formularza?), 
-                   by je zaktualizować w bazie.
+                   JS klonuje je do formularza
+                   by je zaktualizować w bazie
                 -->
                 <button type="submit" class="btn btn-sm btn-success">Zapisz</button>
               </form>
@@ -154,7 +172,7 @@
         <input type="text" class="form-control" name="contact_name">
       </div>
       <div class="col-md-4 mb-3">
-        <label>Phone</label>
+        <label>Telefon</label>
         <input type="text" class="form-control" name="phone_number">
       </div>
     </div>
@@ -164,8 +182,12 @@
         <input type="email" class="form-control" name="email">
       </div>
       <div class="col-md-8 mb-3">
-        <label>Address/Comment</label>
+        <label>Adres</label>
         <input type="text" class="form-control" name="address">
+      </div>
+	  <div class="col-md-8 mb-3">
+        <label>Komentarz</label>
+        <input type="text" class="form-control" name="comment">
       </div>
     </div>
     <button type="submit" class="btn btn-primary">Dodaj dostawcę</button>

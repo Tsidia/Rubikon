@@ -1,7 +1,9 @@
 {% extends "dashboard_base.html" %}
 {% block title %}Konfiguracja - Menadżer{% endblock %}
+
+
 {% block sidebar %}
-  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
+  <!-- Sidebar menadżera -->
   <ul class="nav flex-column">
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
@@ -27,8 +29,23 @@
         Dostawcy <span class="sr-only">(current)</span>
       </a>
     </li>
+	
+	<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('manager.manager_users') }}">
+    <span data-feather="user-check"></span>
+    Użytkownicy
+  </a>
+</li>
 
-    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
+
+
+    <!-- Linki do widoku magazyniera / księgowego -->
     <li class="nav-item">
       <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
         <span data-feather="box"></span>
@@ -45,28 +62,84 @@
 {% endblock %}
 
 {% block content %}
-<h2>Konfiguracja aplikacji</h2>
+<h2>Konfiguracja Aplikacji</h2>
+<p>Ustaw parametry związane z automatycznym zamawianiem i obliczaniem <strong>ROP</strong> i <strong>EOQ</strong>. 
+Poniżej przedstawiono formuły z uwzględnieniem <em>średniej ważonej sprzedaży</em> z ostatnich <code>n</code> dni.</p>
+
+<!-- Wzory w stylu MathJax -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Formuły</h5>
+    <p>
+      <strong>1) Średnia ważona dziennego popytu</strong><br>
+      \( D_{\text{weighted}} = \frac{\sum_{i=1}^{n} (s_i \times w_i)}{\sum_{i=1}^{n} w_i} \)
+      <br>
+      gdzie \(s_i\) to sprzedaż w dniu \(i\), \(w_i\) to waga dnia \(i\) (Nowsza sprzedaż ma większą wagę).
+    </p>
+    <p>
+      <strong>2) ROP (Reorder Point)</strong><br>
+      \( \text{ROP} = D_{\text{weighted}} \times L + SS \) <br>
+      gdzie \(L\) to czas dostawy (lead time), \(SS\) to zapas bezpieczeństwa jako % przewidywanej sprzedaży w okresie dostawy.
+    </p>
+    <p>
+      <strong>3) EOQ (Economic Order Quantity)</strong><br>
+      \( \text{EOQ} = \sqrt{\frac{2 \times K \times (D_{\text{weighted}} \times 365)}{h}} \) <br>
+      gdzie \(K\) to koszt jednego zamówienia, \(h\) to roczny koszt magazynowania jednej sztuki, a \(D_{\text{weighted}} \times 365\) przybliża roczne zapotrzebowanie.
+    </p>
+  </div>
+</div>
+
+<!-- Formularz -->
 <form method="POST">
-  <div class="form-group">
-    <label for="safety_stock">Safety Stock (%)</label>
-    <input type="text" class="form-control" name="safety_stock"
-           value="{{ config.safety_stock }}" required>
+  <div class="row">
+    <!-- h (roczny koszt magazynowania) -->
+    <div class="col-md-4 mb-3">
+      <label for="h_cost">Roczny koszt magazynowania (h)</label>
+      <input type="text" class="form-control" id="h_cost" name="h_cost" 
+             value="{{ config.h_cost if config.h_cost else '' }}" required>
+    </div>
+    <!-- K (koszt pojedynczego zamówienia) -->
+    <div class="col-md-4 mb-3">
+      <label for="ordering_cost">Koszt pojedynczego zamówienia (K)</label>
+      <input type="text" class="form-control" id="ordering_cost" name="ordering_cost"
+             value="{{ config.ordering_cost if config.ordering_cost else '' }}" required>
+    </div>
+    <!-- SS (zapas bezpieczeństwa) -->
+    <div class="col-md-4 mb-3">
+      <label for="safety_stock">Zapas bezpieczeństwa (SS)</label>
+      <input type="text" class="form-control" id="safety_stock" name="safety_stock"
+             value="{{ config.safety_stock if config.safety_stock else '' }}" required>
+    </div>
   </div>
-  <div class="form-group">
-    <label for="ordering_cost">Koszt zamówienia (S)</label>
-    <input type="text" class="form-control" name="ordering_cost"
-           value="{{ config.ordering_cost }}" required>
+
+  <div class="row">
+    <!-- L (lead time) -->
+    <div class="col-md-4 mb-3">
+      <label for="lead_time">Czas dostawy (L, w dniach)</label>
+      <input type="text" class="form-control" id="lead_time" name="lead_time"
+             value="{{ config.lead_time if config.lead_time else '' }}" required>
+    </div>
+    <!-- n (ostatnie dni do analizy) -->
+    <div class="col-md-4 mb-3">
+      <label for="days_range">Ile ostatnich dni uwzględniać (n)</label>
+      <input type="number" class="form-control" id="days_range" name="days_range"
+             value="{{ config.days_range if config.days_range else '30' }}" required>
+    </div>
+  <div class="col-md-4 mb-3">
+    <label for="auto_run_interval">Częstotliwość auto-uruchamiania (min)</label>
+    <input type="number" class="form-control" id="auto_run_interval" name="auto_run_interval"
+           value="{{ config.auto_run_interval if config.auto_run_interval else '0' }}" required>
   </div>
-  <div class="form-group">
-    <label for="holding_cost">Koszt magazynowania (H)</label>
-    <input type="text" class="form-control" name="holding_cost"
-           value="{{ config.holding_cost }}" required>
+</div>
+<button type="submit" class="btn btn-primary">Zapisz</button>
   </div>
-  <div class="form-group">
-    <label for="lead_time">Lead time (dni)</label>
-    <input type="text" class="form-control" name="lead_time"
-           value="{{ config.lead_time }}" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Zapisz</button>
+
+  
 </form>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- MathJax w trybie CDN (opcjonalnie) -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 {% endblock %}

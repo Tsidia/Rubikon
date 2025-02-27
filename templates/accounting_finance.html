@@ -1,0 +1,114 @@
+{% extends "dashboard_base.html" %}
+{% block sidebar %}
+<!-- Sidebar Księgowego -->
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+
+      <!-- Główny Panel Księgowego -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_dashboard') %}active{% endif %}" 
+          href="{{ url_for('accounting.accounting_dashboard') }}">
+          <span data-feather="home"></span>
+          Panel Księgowego
+        </a>
+      </li>
+
+      <!-- Przegląd Zamówień (status płatności) -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_orders') %}active{% endif %}"
+          href="{{ url_for('accounting.accounting_orders') }}">
+          <span data-feather="list"></span>
+          Zamówienia i Płatności
+        </a>
+      </li>
+
+      <!-- Raport Przychodów i Kosztów -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.finance_report') %}active{% endif %}"
+          href="{{ url_for('accounting.finance_report') }}">
+          <span data-feather="bar-chart-2"></span>
+          Raport Finansowy
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Raport Przychodów i Kosztów</h2>
+
+  <!-- Wybór okresu -->
+  <form method="GET" action="{{ url_for('accounting.finance_report') }}" class="form-inline mb-3">
+    <label class="mr-2" for="period">Okres: </label>
+    <select name="period" id="period" class="form-control mr-2">
+      <option value="all" {% if period=='all' %}selected{% endif %}>Całość</option>
+      <option value="month" {% if period=='month' %}selected{% endif %}>Ostatni Miesiąc</option>
+      <option value="quarter" {% if period=='quarter' %}selected{% endif %}>Ostatni Kwartał</option>
+      <option value="year" {% if period=='year' %}selected{% endif %}>Ostatni Rok</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-secondary">Pokaż</button>
+  </form>
+
+  <p>
+    <strong>Przychody:</strong> {{ total_revenue }} <br/>
+    <strong>Koszty:</strong> {{ total_cost }} <br/>
+    <strong>Zysk:</strong> {{ profit }}
+  </p>
+
+  <canvas class="my-4" id="financeChart" width="900" height="380"></canvas>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<script>
+  var ctx = document.getElementById('financeChart').getContext('2d');
+
+  // Etykiety (daty)
+  var labels = {{ chart_labels|tojson }};
+  // Dane przychody
+  var dataRevenue = {{ chart_data_rev|tojson }};
+  // Dane koszty
+  var dataCost = {{ chart_data_cost|tojson }};
+
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Przychody',
+          data: dataRevenue,
+          borderColor: 'green',
+          fill: false
+        },
+        {
+          label: 'Koszty',
+          data: dataCost,
+          borderColor: 'red',
+          fill: false
+        }
+      ]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    }
+  });
+</script>
+{% endblock %}

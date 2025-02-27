@@ -1,0 +1,34 @@
+{% extends "dashboard_base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Sklep Rubikon</h2>
+  <p>Wybierz produkty i dodaj do koszyka.</p>
+
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nazwa</th>
+        <th>Cena</th>
+        <th>Akcja</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>{{ p.product_id }}</td>
+        <td>{{ p.product_name }}</td>
+        <td>{{ p.price }}</td>
+        <td>
+          <form action="{{ url_for('store.add_to_cart', product_id=p.product_id) }}" method="POST">
+            <button type="submit" class="btn btn-sm btn-primary">Dodaj do koszyka</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('store.view_cart') }}" class="btn btn-secondary">Zobacz koszyk</a>
+</div>
+{% endblock %}

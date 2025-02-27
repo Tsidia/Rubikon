@@ -1,0 +1,32 @@
+{% extends "dashboard_base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Twój koszyk</h2>
+  {% if cart %}
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>ID produktu</th>
+          <th>Ilość</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pid, qty in cart.items() %}
+        <tr>
+          <td>{{ pid }}</td>
+          <td>{{ qty }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form method="POST" action="{{ url_for('store.checkout') }}">
+      <button type="submit" class="btn btn-success">Złóż zamówienie</button>
+    </form>
+  {% else %}
+    <p>Koszyk jest pusty.</p>
+  {% endif %}
+
+  <a href="{{ url_for('store.store_home') }}" class="btn btn-link">Kontynuuj zakupy</a>
+</div>
+{% endblock %}

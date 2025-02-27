@@ -1,3 +1,4 @@
+<!-- manager_dashboard.html-->
 {% extends "dashboard_base.html" %}
 
 {% block title %}
@@ -6,7 +7,6 @@
 
 {% block sidebar %}
   <ul class="nav flex-column">
-    <!-- Link do menadżerowego dashboardu -->
     <li class="nav-item">
       <a class="nav-link active" href="{{ url_for('manager.manager_dashboard') }}">
         <span data-feather="home"></span>
@@ -34,6 +34,20 @@
         Dostawcy
       </a>
     </li>
+	
+	<li class="nav-item">
+  <a class="nav-link" href="{{ url_for('manager.manager_users') }}">
+    <span data-feather="user-check"></span>
+    Użytkownicy
+  </a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
 
     <!-- Linki do widoków magazyniera i księgowego (menadżer może to podglądać) -->
     <li class="nav-item">
@@ -54,4 +68,8 @@
 {% block content %}
   <h1>Witaj w panelu menadżera</h1>
   <p>Tutaj znajdziesz dostęp do wszystkich funkcji systemu: konfiguracji, zamówień, dostawców, raportów...</p>
+  <form method="POST" action="{{ url_for('manager.run_rop_eoq') }}">
+  <button type="submit" class="btn btn-warning">Uruchom algorytm ROP+EOQ</button>
+</form>
+
 {% endblock %}

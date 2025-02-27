@@ -1,0 +1,106 @@
+{% extends "dashboard_base.html" %}
+{% block sidebar %}
+<!-- Sidebar Księgowego -->
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+
+      <!-- Główny Panel Księgowego -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_dashboard') %}active{% endif %}" 
+          href="{{ url_for('accounting.accounting_dashboard') }}">
+          <span data-feather="home"></span>
+          Panel Księgowego
+        </a>
+      </li>
+
+      <!-- Przegląd Zamówień (status płatności) -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_orders') %}active{% endif %}"
+          href="{{ url_for('accounting.accounting_orders') }}">
+          <span data-feather="list"></span>
+          Zamówienia i Płatności
+        </a>
+      </li>
+
+      <!-- Raport Przychodów i Kosztów -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.finance_report') %}active{% endif %}"
+          href="{{ url_for('accounting.finance_report') }}">
+          <span data-feather="bar-chart-2"></span>
+          Raport Finansowy
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Przegląd Zamówień (Płatności)</h2>
+
+  <p>Filtrowanie po statusie płatności:</p>
+  <form method="GET" action="{{ url_for('accounting.accounting_orders') }}" class="form-inline mb-3">
+    <select name="filter_status" class="form-control mr-2">
+      <option value="">-- wszystkie --</option>
+      <option value="pending" {% if filter_status == 'pending' %}selected{% endif %}>pending</option>
+      <option value="paid" {% if filter_status == 'paid' %}selected{% endif %}>paid</option>
+      <option value="refunded" {% if filter_status == 'refunded' %}selected{% endif %}>refunded</option>
+      <option value="cancelled" {% if filter_status == 'cancelled' %}selected{% endif %}>cancelled</option>
+    </select>
+    <button type="submit" class="btn btn-sm btn-secondary">Filtruj</button>
+  </form>
+
+  <!-- Raport ile jest w każdym statusie -->
+  <p>Raport statusów płatności:</p>
+  <ul>
+    {% for ps, cnt in status_counts.items() %}
+      <li>{{ ps }}: {{ cnt }}</li>
+    {% endfor %}
+  </ul>
+
+  <!-- Tabela zamówień -->
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Data Zamówienia</th>
+        <th>Status</th>
+        <th>Kwota</th>
+        <th>Płatność</th>
+        <th>Akcja</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>{{ o.order_id }}</td>
+        <td>{{ o.order_date }}</td>
+        <td>{{ o.status }}</td>
+        <td>{{ o.total_amount }}</td>
+        <td>{{ o.payment_status }}</td>
+        <td>
+          <!-- Formularz do zmiany payment_status -->
+          <form method="POST" action="{{ url_for('accounting.accounting_orders') }}" class="form-inline">
+            <input type="hidden" name="order_id" value="{{ o.order_id }}">
+            <select name="new_payment_status" class="form-control mr-2">
+              <option value="pending" {% if o.payment_status == 'pending' %}selected{% endif %}>pending</option>
+              <option value="paid" {% if o.payment_status == 'paid' %}selected{% endif %}>paid</option>
+              <option value="refunded" {% if o.payment_status == 'refunded' %}selected{% endif %}>refunded</option>
+              <option value="cancelled" {% if o.payment_status == 'cancelled' %}selected{% endif %}>cancelled</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Zmień</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('accounting.accounting_dashboard') }}" class="btn btn-link">Powrót do panelu księgowego</a>
+</div>
+{% endblock %}

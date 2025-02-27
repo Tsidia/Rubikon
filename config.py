@@ -5,16 +5,18 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
     # Parametry bazy danych:
-    DB_HOST = 'sql.freedb.tech'     # np. 'your-db-host.com'
-    DB_USER = 'freedb_rubikon'       # nazwa użytkownika w MySQL
-    DB_PASS = 'p3h%RnYB9HgeVbe'           # hasło do bazy
-    DB_NAME = 'freedb_rubikon'            # nazwa bazy danych, którą utworzymy / będziemy używać
+    DB_HOST = 'sql.freedb.tech'
+    DB_USER = 'freedb_rubikon'
+    DB_PASS = 'p3h%RnYB9HgeVbe'
+    DB_NAME = 'freedb_rubikon'
 
-    # Przykładowe domyślne parametry algorytmu, które menadżer może nadpisać
+    # Domyślne parametry algorytmu, fallback dla ładowania konfiguracji
     DEFAULT_SAFETY_STOCK = 0.25
     ORDERING_COST = 50.0
     HOLDING_COST = 2.0
     LEAD_TIME = 7
+    DAYS_RANGE = 30
+    AUTO_RUN_INTERVAL = 60
 
     # Dodatkowe ustawienia Flaska
     SESSION_COOKIE_NAME = "RubikonShopSession"

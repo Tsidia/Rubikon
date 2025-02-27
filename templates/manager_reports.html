@@ -1,0 +1,167 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}
+Raporty - Menadżer
+{% endblock %}
+
+{% block sidebar %}
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+      <span data-feather="home"></span>
+      Panel Menadżera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+      <span data-feather="settings"></span>
+      Konfiguracja
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_manual_order') }}">
+      <span data-feather="edit"></span>
+      Manualne Zamówienie
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+      <span data-feather="users"></span>
+      Dostawcy
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_users') }}">
+      <span data-feather="user-check"></span>
+      Użytkownicy <span class="sr-only">(current)</span>
+    </a>
+  </li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+      <span data-feather="box"></span>
+      Panel Magazyniera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <span data-feather="dollar-sign"></span>
+      Panel Księgowego
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<h2>Raporty</h2>
+<a href="{{ url_for('manager.manager_reports') }}" class="btn btn-primary">Wykres sprzedaży</a>
+<a href="{{ url_for('manager.manager_reports', view='logs') }}" class="btn btn-secondary">Logi systemowe</a>
+
+{% if view == 'logs' %}
+  <h4>Logi systemowe (ostatnie 500 linii)</h4>
+  
+  {% if log_lines and log_lines|length > 0 %}
+    <!-- Paginacja: link do poprzedniej strony, następnej, itp. -->
+    <div class="mb-2">
+      Strona {{ page }} z {{ total_pages }}
+      {% if page > 1 %}
+        <a class="btn btn-sm btn-outline-secondary" 
+           href="{{ url_for('manager.manager_reports', view='logs', page=page-1) }}">Poprzednia</a>
+      {% endif %}
+      {% if page < total_pages %}
+        <a class="btn btn-sm btn-outline-secondary"
+           href="{{ url_for('manager.manager_reports', view='logs', page=page+1) }}">Następna</a>
+      {% endif %}
+    </div>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Log</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for (date_str, content) in log_lines %}
+        <tr>
+          <td style="white-space:nowrap;">{{ date_str }}</td>
+          <td>{{ content }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Brak linii w logu.</p>
+  {% endif %}
+
+{% else %}
+<p>Wybierz produkt, aby zobaczyć historię popytu (sprzedaży) z ostatniego roku.</p>
+
+<form method="GET" action="{{ url_for('manager.manager_reports') }}" class="form-inline">
+  <label class="mr-2">Produkt:</label>
+  <select name="product_id" class="form-control mr-2">
+    <option value="">-- wybierz --</option>
+    {% for p in products %}
+      <option value="{{ p.product_id }}"
+        {% if product_id and p.product_id == product_id|int %} selected {% endif %}
+      >
+        {{ p.product_name }}
+      </option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-primary">Wyświetl</button>
+</form>
+
+<hr>
+
+{% if product_id %}
+  <h4>Wykres sprzedaży produktu ID={{ product_id }}</h4>
+  {% if chart_data and chart_labels %}
+    <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
+  {% else %}
+    <p>Brak danych sprzedażowych dla wybranego produktu.</p>
+  {% endif %}
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.1/dist/Chart.min.js"></script>
+<script>
+{% if chart_data and chart_labels %}
+  var ctx = document.getElementById("myChart");
+  var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels|tojson }},
+      datasets: [{
+        data: {{ chart_data|tojson }},
+        lineTension: 0,
+        backgroundColor: 'transparent',
+        borderColor: '#007bff',
+        borderWidth: 2,
+        pointBackgroundColor: '#007bff'
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: false
+          }
+        }]
+      },
+      legend: {
+        display: false,
+      }
+    }
+  });
+{% endif %}
+</script>
+{% endblock %}

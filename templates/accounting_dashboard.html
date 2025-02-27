@@ -1,0 +1,49 @@
+{% extends "dashboard_base.html" %}
+{% block sidebar %}
+<!-- Sidebar Księgowego -->
+<nav class="col-md-2 d-none d-md-block bg-light sidebar">
+  <div class="sidebar-sticky">
+    <ul class="nav flex-column">
+
+      <!-- Główny Panel Księgowego -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_dashboard') %}active{% endif %}" 
+          href="{{ url_for('accounting.accounting_dashboard') }}">
+          <span data-feather="home"></span>
+          Panel Księgowego
+        </a>
+      </li>
+
+      <!-- Przegląd Zamówień (status płatności) -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.accounting_orders') %}active{% endif %}"
+          href="{{ url_for('accounting.accounting_orders') }}">
+          <span data-feather="list"></span>
+          Zamówienia i Płatności
+        </a>
+      </li>
+
+      <!-- Raport Przychodów i Kosztów -->
+      <li class="nav-item">
+        <a class="nav-link 
+          {% if request.path == url_for('accounting.finance_report') %}active{% endif %}"
+          href="{{ url_for('accounting.finance_report') }}">
+          <span data-feather="bar-chart-2"></span>
+          Raport Finansowy
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Panel Księgowego</h2>
+  <p>Witaj w panelu księgowego. Tutaj znajdziesz planowane raporty finansowe, 
+     listę zamówień do weryfikacji pod kątem płatności, 
+     i inne analizy potrzebne w księgowości.</p>
+</div>
+{% endblock %}

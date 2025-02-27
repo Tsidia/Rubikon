@@ -1,5 +1,4 @@
 {% extends "dashboard_base.html" %}
-
 {% block sidebar %}
 <!-- Sidebar dla Magazyniera -->
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
@@ -48,17 +47,46 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-4">
-  <h2>Panel Magazyniera</h2>
-  <p>Witaj w panelu magazyniera.</p>
-  
-  <p>
-    Skorzystaj z menu po lewej, aby:
-  </p>
-  <ul>
-    <li>Przejrzeć i zaktualizować stany magazynowe (<strong>Magazyn</strong>)</li>
-    <li>Sprawdzić lub potwierdzić dostawy (<strong>Dostawy</strong>)</li>
-    <li>Wysłać zamówienia do klientów (<strong>Wysyłki</strong>)</li>
-  </ul>
-  
+
+  <h2>Stan Magazynowy i Ręczna Korekta</h2>
+  <p>Niżej znajdują się produkty z informacją, jak bardzo stan jest blisko ROP. 
+     Kolor czerwony oznacza, że stan < ROP. 
+     Żółty oznacza zbliżanie się do ROP. 
+     Zielony oznacza bezpieczny zapas.</p>
+
+  <table class="table table-sm">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Produkt</th>
+        <th>Stan Aktualny</th>
+        <th>ROP</th>
+        <th>(Stan - ROP)</th>
+        <th>Manualna Korekta</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr class="{{ item.color_class }}">
+        <td>{{ item.product_id }}</td>
+        <td>{{ item.product_name }}</td>
+        <td>{{ item.stock_now }}</td>
+        <td>{{ item.rop }}</td>
+        <td>{{ item.diff }}</td>
+        <td>
+          <!-- Formularz do korekty dla jednego produktu -->
+          <form action="{{ url_for('warehouse.warehouse_inventory') }}" method="POST" class="form-inline">
+            <input type="hidden" name="product_id" value="{{ item.product_id }}">
+            <input type="number" name="new_quantity" class="form-control mr-2"
+                   placeholder="Nowy stan" value="{{ item.stock_now }}" min="0">
+            <button type="submit" class="btn btn-sm btn-warning">Zapisz</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('warehouse.warehouse_dashboard') }}" class="btn btn-link">Powrót do panelu</a>
 </div>
 {% endblock %}

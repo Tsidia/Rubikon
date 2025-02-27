@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pl">
+<!-- dashboard_base.html --!>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,6 +19,8 @@
   </head>
 
   <body>
+  
+  
     <!-- GÓRNY NAVBAR -->
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
   {% if role_name == 'manager' %}
@@ -45,9 +48,6 @@
         <nav class="col-md-2 d-none d-md-block bg-light sidebar">
           <div class="sidebar-sticky">
             {% block sidebar %}
-            <!-- Domyślny sidebar -> linki do Orders, Products, Reports, itp.
-                 Możesz tu dać if-y w zależności od roli użytkownika
-                 lub nadpisać ten blok w widokach szczegółowych. -->
             <ul class="nav flex-column">
               <li class="nav-item">
                 <a class="nav-link active" href="#">
@@ -55,7 +55,6 @@
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
               </li>
-              <!-- Inne linki -->
             </ul>
             {% endblock %}
           </div>
@@ -63,10 +62,22 @@
 
         <!-- Główna część strony -->
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+		 {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
           {% block content %}
           <!-- Każdy konkretny widok (np. manager, warehouse) uzupełnia tutaj. -->
           {% endblock %}
         </main>
+
       </div>
     </div>
 

@@ -1,71 +1,165 @@
 {% extends "dashboard_base.html" %}
-{% block title %}Manualne Zamówienie - Menadżer{% endblock %}
-{% block sidebar %}
-  <!-- Sidebar menadżera, z linkami do "Konfiguracja", "Dostawcy", "Manual Order", itd. -->
-  <ul class="nav flex-column">
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
-        <span data-feather="home"></span>
-        Panel Menadżera
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
-        <span data-feather="settings"></span>
-        Konfiguracja
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link active" href="{{ url_for('manager.manager_manual_order') }}">
-        <span data-feather="edit"></span>
-        Manualne Zamówienie
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
-        <span data-feather="users"></span>
-        Dostawcy <span class="sr-only">(current)</span>
-      </a>
-    </li>
-
-    <!-- Linki do widoku magazyniera / księgowego, jeśli menadżer ma do nich dostęp -->
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
-        <span data-feather="box"></span>
-        Panel Magazyniera
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('accounting.accounting_dashboard') }}">
-        <span data-feather="dollar-sign"></span>
-        Panel Księgowego
-      </a>
-    </li>
-  </ul>
+{% block title %}
+Manualne Zamówienie - Menadżer
 {% endblock %}
+
+{% block sidebar %}
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+      <span data-feather="home"></span>
+      Panel Menadżera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+      <span data-feather="settings"></span>
+      Konfiguracja
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('manager.manager_manual_order') }}">
+      <span data-feather="edit"></span>
+      Manualne Zamówienie <span class="sr-only">(current)</span>
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+      <span data-feather="users"></span>
+      Dostawcy
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_users') }}">
+      <span data-feather="user-check"></span>
+      Użytkownicy
+    </a>
+  </li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+      <span data-feather="box"></span>
+      Panel Magazyniera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <span data-feather="dollar-sign"></span>
+      Panel Księgowego
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
 {% block content %}
-  <h2>Manualne zamówienie do dostawcy</h2>
-  <form method="POST">
-    <div class="form-group">
-      <label for="supplier_id">Dostawca</label>
-      <select class="form-control" name="supplier_id">
-        {% for s in suppliers %}
-          <option value="{{ s.supplier_id }}">{{ s.supplier_name }}</option>
-        {% endfor %}
-      </select>
+<h2>Manualne Zamówienie do Dostawcy</h2>
+<p>Udajemy, że poniżej składamy zamówienie przez zewnętrzne API. 
+Po złożeniu zamówienia system ustawi <code>expected_delivery_date</code> 
+według <code>lead_time_days</code> wybranego dostawcy.</p>
+
+<form method="POST" action="{{ url_for('manager.manager_manual_order') }}">
+  <div class="form-group">
+    <label for="supplier_id">Dostawca</label>
+    <select class="form-control" name="supplier_id" id="supplier_id" required>
+      <option value="">-- wybierz dostawcę --</option>
+      {% for s in suppliers %}
+        <option value="{{ s.supplier_id }}">{{ s.supplier_name }} ({{ s.lead_time_days }} dni)</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Kontener na wiersze produktów -->
+  <div id="products-container">
+    <!-- Wiersz domyślny (pierwszy) -->
+    <div class="product-row form-row mb-2" data-index="0">
+      <div class="col-md-6">
+        <label>Produkt</label>
+        <select class="form-control" name="product_id_0" required>
+          <option value="">-- wybierz produkt --</option>
+          {% for p in products %}
+            <option value="{{ p.product_id }}">{{ p.product_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label>Ilość</label>
+        <input type="number" class="form-control" name="quantity_0" min="1" required>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="button" class="btn btn-danger remove-row-btn" style="margin-top: 30px;"
+                onclick="removeRow(this)" title="Usuń wiersz">
+          <span data-feather="trash-2"></span>
+        </button>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="product_id">Produkt</label>
-      <select class="form-control" name="product_id">
-        {% for p in products %}
-          <option value="{{ p.product_id }}">{{ p.product_name }}</option>
-        {% endfor %}
-      </select>
+  </div>
+
+  <!-- Przycisk dodawania kolejnych wierszy -->
+  <div class="form-row mb-4">
+    <div class="col">
+      <button type="button" class="btn btn-secondary" onclick="addProductRow()">
+        Dodaj kolejny produkt
+      </button>
     </div>
-    <div class="form-group">
-      <label for="quantity">Ilość</label>
-      <input type="number" class="form-control" name="quantity" min="1" required>
+  </div>
+
+  <!-- Przycisk złożenia zamówienia -->
+  <div class="form-row">
+    <div class="col">
+      <button type="submit" class="btn btn-primary">Złóż zamówienie</button>
     </div>
-    <button type="submit" class="btn btn-primary">Zamów</button>
-  </form>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  let productIndex = 1;  // mamy row index=0 już w DOM
+
+  function addProductRow(){
+    const container = document.getElementById("products-container");
+    const rowDiv = document.createElement("div");
+    rowDiv.className = "product-row form-row mb-2";
+    rowDiv.setAttribute("data-index", productIndex);
+
+    let html = `
+      <div class="col-md-6">
+        <label>Produkt</label>
+        <select class="form-control" name="product_id_${productIndex}" required>
+          <option value="">-- wybierz produkt --</option>
+          {% for p in products %}
+            <option value="{{ p.product_id }}">{{ p.product_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label>Ilość</label>
+        <input type="number" class="form-control" name="quantity_${productIndex}" min="1" required>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="button" class="btn btn-danger remove-row-btn" style="margin-top: 30px;"
+                onclick="removeRow(this)" title="Usuń wiersz">
+          <span data-feather="trash-2"></span>
+        </button>
+      </div>
+    `;
+    rowDiv.innerHTML = html;
+    container.appendChild(rowDiv);
+
+    productIndex++;
+    if(window.feather) feather.replace(); // re-render icon
+  }
+
+  function removeRow(btn){
+    // usuwa dany wiersz
+    let row = btn.closest('.product-row');
+    row.remove();
+  }
+</script>
 {% endblock %}

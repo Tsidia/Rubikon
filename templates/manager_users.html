@@ -1,0 +1,213 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}
+  Zarządzanie Użytkownikami - Menadżer
+{% endblock %}
+
+{% block sidebar %}
+<ul class="nav flex-column">
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_dashboard') }}">
+      <span data-feather="home"></span>
+      Panel Menadżera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_config') }}">
+      <span data-feather="settings"></span>
+      Konfiguracja
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_manual_order') }}">
+      <span data-feather="edit"></span>
+      Manualne Zamówienie
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_suppliers') }}">
+      <span data-feather="users"></span>
+      Dostawcy
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('manager.manager_users') }}">
+      <span data-feather="user-check"></span>
+      Użytkownicy <span class="sr-only">(current)</span>
+    </a>
+  </li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.manager_reports') }}">
+      <span data-feather="bar-chart-2"></span>
+      Raporty
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('warehouse.warehouse_dashboard') }}">
+      <span data-feather="box"></span>
+      Panel Magazyniera
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#">
+      <span data-feather="dollar-sign"></span>
+      Panel Księgowego
+    </a>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<h2>Zarządzanie Użytkownikami</h2>
+
+<div class="table-responsive">
+  <table class="table table-striped table-sm" id="usersTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Rola</th>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Hasło (nowe?)</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr data-user-id="{{ u.user_id }}">
+        <!-- user_id -->
+        <td>
+          {{ u.user_id }}
+          <input type="hidden" name="user_id" value="{{ u.user_id }}">
+        </td>
+        <!-- Email -->
+        <td>
+          <span class="view-mode">{{ u.email }}</span>
+          <input type="text" class="form-control edit-mode" name="email" value="{{ u.email }}" style="display:none;">
+        </td>
+        <!-- Rola -->
+        <td>
+          <span class="view-mode">{{ u.role_name }}</span>
+          <select name="role_name" class="form-control edit-mode" style="display:none;">
+            {% for r in roles %}
+              <option value="{{ r }}" {% if r == u.role_name %}selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <!-- Imie -->
+        <td>
+          <span class="view-mode">{{ u.first_name }}</span>
+          <input type="text" class="form-control edit-mode" name="first_name" value="{{ u.first_name }}" style="display:none;">
+        </td>
+        <!-- Nazwisko -->
+        <td>
+          <span class="view-mode">{{ u.last_name }}</span>
+          <input type="text" class="form-control edit-mode" name="last_name" value="{{ u.last_name }}" style="display:none;">
+        </td>
+        <!-- Hasło opcjonalnie -->
+        <td>
+          <span class="view-mode">******</span>
+          <input type="password" class="form-control edit-mode" name="password" placeholder="(nowe hasło)" style="display:none;">
+        </td>
+        <!-- Actions -->
+        <td>
+          <div class="view-mode">
+            <form method="POST" style="display:inline;" onsubmit="return enterEditMode(this);">
+              <input type="hidden" name="action" value="edit_mode">
+              <input type="hidden" name="user_id" value="{{ u.user_id }}">
+              <button type="submit" class="btn btn-sm btn-secondary">Edytuj</button>
+            </form>
+            <form method="POST" style="display:inline;">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="user_id" value="{{ u.user_id }}">
+              <input type="hidden" name="role_name" value="{{ u.role_name }}">
+              <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+            </form>
+          </div>
+          <div class="edit-mode" style="display:none;">
+            <form method="POST" class="editForm" style="display:inline;">
+              <input type="hidden" name="action" value="edit">
+              <input type="hidden" name="user_id" value="{{ u.user_id }}">
+              <button type="submit" class="btn btn-sm btn-success">Zapisz</button>
+            </form>
+            <button type="button" class="btn btn-sm btn-light" onclick="cancelEdit(this)">Anuluj</button>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Dodanie nowego użykownika -->
+<h3>Dodaj nowego użytkownika</h3>
+<form method="POST">
+  <input type="hidden" name="action" value="add">
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label>Email</label>
+      <input type="text" class="form-control" name="email" required>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Hasło</label>
+      <input type="password" class="form-control" name="password" required>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Rola</label>
+      <select name="role_name" class="form-control">
+        {% for r in roles %}
+          <option value="{{ r }}">{{ r }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label>Imię</label>
+      <input type="text" class="form-control" name="first_name" required>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label>Nazwisko</label>
+      <input type="text" class="form-control" name="last_name" required>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Dodaj użytkownika</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  function enterEditMode(form) {
+    event.preventDefault();
+    let tr = form.closest('tr');
+    let viewModes = tr.querySelectorAll('.view-mode');
+    let editModes = tr.querySelectorAll('.edit-mode');
+    viewModes.forEach(el => el.style.display = 'none');
+    editModes.forEach(el => el.style.display = '');
+    return false;
+  }
+  function cancelEdit(btn) {
+    let tr = btn.closest('tr');
+    let viewModes = tr.querySelectorAll('.view-mode');
+    let editModes = tr.querySelectorAll('.edit-mode');
+    editModes.forEach(el => el.style.display = 'none');
+    viewModes.forEach(el => el.style.display = '');
+  }
+  
+  document.querySelectorAll('.editForm').forEach(editForm => {
+    editForm.addEventListener('submit', function(e) {
+      let tr = editForm.closest('tr');
+      let inputs = tr.querySelectorAll('input.edit-mode, select.edit-mode');
+      inputs.forEach(inp => {
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = inp.name;
+        hidden.value = inp.value;
+        editForm.appendChild(hidden);
+      });
+    });
+  });
+</script>
+{% endblock %}

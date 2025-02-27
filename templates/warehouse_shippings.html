@@ -1,3 +1,4 @@
+<!--Warehouse_shippings.html --!>
 {% extends "dashboard_base.html" %}
 
 {% block sidebar %}
@@ -46,19 +47,48 @@
   </div>
 </nav>
 {% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-  <h2>Panel Magazyniera</h2>
-  <p>Witaj w panelu magazyniera.</p>
-  
-  <p>
-    Skorzystaj z menu po lewej, aby:
-  </p>
-  <ul>
-    <li>Przejrzeć i zaktualizować stany magazynowe (<strong>Magazyn</strong>)</li>
-    <li>Sprawdzić lub potwierdzić dostawy (<strong>Dostawy</strong>)</li>
-    <li>Wysłać zamówienia do klientów (<strong>Wysyłki</strong>)</li>
-  </ul>
-  
+  <h2>Wysyłki do Klientów</h2>
+  <p>Lista zamówień klientów, które oczekują na wysyłkę. Poniżej możesz potwierdzić wysyłkę.</p>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-sm">
+      <thead>
+        <tr>
+          <th>ID Zamówienia</th>
+          <th>Data Zamówienia</th>
+          <th>Klient</th>
+          <th>Adres Dostawy</th>
+          <th>Status</th>
+          <th>Akcja</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.customer_order_id }}</td>
+          <td>{{ order.order_date }}</td>
+          <td>{{ order.customer_name or 'Nieznany' }}</td>
+          <td>{{ order.shipping_address }}</td>
+          <td>{{ order.status }}</td>
+          <td>
+            {% if order.status == 'new' or order.status == 'pending' %}
+              <form method="POST" 
+                    action="{{ url_for('warehouse.confirm_shipping', customer_order_id=order.customer_order_id) }}">
+                <button type="submit" class="btn btn-sm btn-secondary">Potwierdź wysyłkę</button>
+              </form>
+            {% else %}
+              <em>Wysłane</em>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <a href="{{ url_for('warehouse.warehouse_dashboard') }}" class="btn btn-link">Powrót do panelu</a>
 </div>
 {% endblock %}

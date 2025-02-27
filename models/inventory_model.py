@@ -1,4 +1,4 @@
-# models/inventory_model.py
+# inventory_model.py
 import pymysql
 from models.user_model import get_connection
 def get_all_inventory():
@@ -20,7 +20,7 @@ def get_all_inventory():
 
 def update_inventory_quantity(product_id, new_quantity):
     """
-    Ustawia wprost quantity_in_stock = new_quantity
+    Ustawia quantity_in_stock = new_quantity
     w tabeli inventory dla danego product_id.
     """
     conn = get_connection()
