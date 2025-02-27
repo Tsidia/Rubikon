@@ -1,8 +1,9 @@
 import os
 
 class Config:
-    # Klucz potrzebny do sesji Flaska, flash messages itp.
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    # Klucz potrzebny do sesji Flaska, flash messages itp. Na potrzeby pracy klucze bezpośrednio w kodzie. W środowisku produkcyjnym potrzebne coś w stylu
+    #SECRET_KEY = os.environ.get("SECRET_KEY")
+    SECRET_KEY = "###kdsglfakl@#!@fg$1mg1f4124akmv"
 
     # Parametry bazy danych:
     DB_HOST = 'sql.freedb.tech'
